@@ -43,13 +43,14 @@ jobs:
       - name: todo output
         run : |
            ls frontend/dist
+           ls frontend/dist/assets
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './frontend/dist'
+          path: './frontend/dist/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
