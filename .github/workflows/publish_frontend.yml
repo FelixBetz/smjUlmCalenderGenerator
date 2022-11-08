@@ -40,10 +40,9 @@ jobs:
       - name: run build
         run : |
            cd frontend && npm run build 
-      - name: todo output
+      - name: replace asset url
         run : |
-           ls frontend/dist
-           ls frontend/dist/assets
+           sed -i 's/assets/smjUlmCalenderGenerator#/assets/' ./dist/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
