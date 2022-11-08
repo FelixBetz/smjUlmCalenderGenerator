@@ -1,45 +1,49 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
+
+  import type {Asset, LatestRelease} from './lib/interfaces'
+	import {  onMount } from 'svelte';
+
+
+  const GITHUB_URL =   "https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest"
+
+
+  let assets : Asset[] = [];
+
+  async function getDatabaseTodos()/*: Promise<TodoItem[]>*/ {
+		const response = await fetch(GITHUB_URL)
+			.then((res) => res.json())
+			.then((res:LatestRelease) => {
+        console.log(res.assets);
+      assets = res.assets;
+      }
+
+        
+        
+        )
+			.catch((error: Error) => {
+				console.log(error);
+				return [];
+			});
+		return response;
+	}
+
+
+  onMount(async () => {
+		await getDatabaseTodos();
+	});
+
 </script>
 
 <main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer"> 
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer"> 
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+  
+  <h1>SMJ Ulm Kalender</h1>
+<ul>
 
-  <div class="card">
-    <Counter />
-  </div>
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
+  {#each assets as asset}
+  <li><a href="{asset.browser_download_url}">{asset.name}</a></li>
+  {/each}
+</ul>
 
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
 </main>
 
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
-</style>
