@@ -24,6 +24,8 @@
 
   let calenders: Calender[] = [];
 
+  let url = "";
+
   function icsTimestampToDate(icsTimestamp: string) {
     let year = icsTimestamp.slice(0, 4);
     let month = icsTimestamp.slice(6, 8);
@@ -73,10 +75,12 @@
 
   onMount(async () => {
     await getCalenderAssets();
+    url = window.location.href;
   });
 </script>
 
 <Styles />
+{url}
 <main style="padding: 50px;">
   <h1>SMJ Ulm Kalender</h1>
   <Row>
