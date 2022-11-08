@@ -19,8 +19,8 @@
     events: Event[];
   }
 
-  const GITHUB_URL = "latest.json";
-  //"https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest";
+  const GITHUB_URL =
+    "https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest";
 
   let calenders: Calender[] = [];
 
