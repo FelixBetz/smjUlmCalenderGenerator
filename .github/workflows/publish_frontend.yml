@@ -42,7 +42,7 @@ jobs:
            cd frontend && npm run build 
       - name: replace asset url
         run : |
-           sed -i 's/assets/smjUlmCalenderGenerator#/assets' ./dist/index.html
+           sed -i 's!assets!smjUlmCalenderGenerator/assets' ./dist/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
