@@ -1,6 +1,9 @@
-name: PylintPytest
+name: Pylint
 
-on: [push]
+on:  
+  push:
+    branches:
+      - main
 
 jobs:
   build:
