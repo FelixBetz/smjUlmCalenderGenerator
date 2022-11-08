@@ -2,17 +2,29 @@
   import type { Asset, LatestRelease } from "./lib/interfaces";
   import { onMount } from "svelte";
 
-  const GITHUB_URL =
-    "https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest";
+  import { Styles } from "sveltestrap";
+  import {
+    Container,
+    Col,
+    Row,
+    Card,
+    CardTitle,
+    CardBody,
+    CardHeader,
+  } from "sveltestrap/src";
 
-  let assets: Asset[] = [];
+  const GITHUB_URL = "latest.json";
+  //"https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest";
+
+  type Calender = Asset[];
+  let calenders: Calender[] = [];
 
   async function getDatabaseTodos() /*: Promise<TodoItem[]>*/ {
     const response = await fetch(GITHUB_URL)
       .then((res) => res.json())
       .then((res: LatestRelease) => {
-        console.log(res.assets);
-        assets = res.assets;
+        calenders[0] = res.assets;
+        calenders[1] = res.assets;
       })
       .catch((error: Error) => {
         console.log(error);
@@ -26,11 +38,26 @@
   });
 </script>
 
+<Styles />
 <main>
   <h1>SMJ Ulm Kalender</h1>
-  <ul>
-    {#each assets as asset}
-      <li><a href={asset.browser_download_url}>{asset.name}</a></li>
+
+  <Container>
+    {#each calenders as assets}
+      <Card>
+        <CardHeader>
+          <CardTitle>{assets[0].name.split("_")[0]}</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <Row>
+            {#each assets as asset}
+              <Col>
+                <a href={asset.browser_download_url}>{asset.name}</a>
+              </Col>
+            {/each}
+          </Row>
+        </CardBody>
+      </Card>
     {/each}
-  </ul>
+  </Container>
 </main>
