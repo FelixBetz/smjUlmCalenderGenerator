@@ -8,6 +8,8 @@ class OEvent:
         self.name = name
         self.start_datetime = start_datetime
         self.end_datetime = end_datetime
+        self.description = ""
+        self.location = ""
 
     def __str__(self):
         return self.name + ": " + str(self.start_datetime) + " to " + str(self.end_datetime)

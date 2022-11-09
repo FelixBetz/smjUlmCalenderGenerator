@@ -18,8 +18,10 @@ INDEX_START_DATE = 1
 INDEX_START_TIME = 2
 INDEX_END_DATE = 3
 INDEX_END_TIME = 4
+INDEX_DESCRIPTION = 5
+INDEX_LOCATION = 6
 
-INDEX_CALENDER_CATEGORY = 5
+INDEX_CALENDER_CATEGORY = 7
 
 
 def rmdir(directory):
@@ -36,7 +38,7 @@ def rmdir(directory):
 
 def string_to_datetime(arg_date, arg_time):
     """convert date string and time string to dateime object"""
-    date = datetime.strptime(arg_date, '%m.%d.%Y').date()
+    date = datetime.strptime(arg_date, '%d.%m.%Y').date()
     if arg_time == "":
         return date
     time = datetime.strptime(arg_time, "%H:%M").time()
@@ -54,25 +56,38 @@ def csv_to_o_calender(arg_csv_path):
             if row_index == 0:
                 for col_index in range(INDEX_CALENDER_CATEGORY, len(row)):
                     calender.append(OCalender(row[col_index]))
+
+            # skip empty rows
+            elif row[0] == "":
+                pass
             # parse events properties
             else:
-                loc_name = row[INDEX_NAME].strip()
+                try:
+                    loc_name = row[INDEX_NAME].strip()
 
-                start_datetime = string_to_datetime(
-                    row[INDEX_START_DATE].strip(),
-                    row[INDEX_START_TIME].strip())
+                    loc_start_datetime = string_to_datetime(
+                        row[INDEX_START_DATE].strip(),
+                        row[INDEX_START_TIME].strip())
 
-                end_startime = string_to_datetime(
-                    row[INDEX_END_DATE].strip(),
-                    row[INDEX_END_TIME].strip())
+                    loc_end_startime = string_to_datetime(
+                        row[INDEX_END_DATE].strip(),
+                        row[INDEX_END_TIME].strip())
 
-                loc_event = OEvent(loc_name, start_datetime, end_startime)
+                    loc_description = row[INDEX_DESCRIPTION]
+                    loc_location = row[INDEX_LOCATION]
 
-                calender[0].append_event(loc_event)
-                for col_index in range(INDEX_CALENDER_CATEGORY, len(row)):
-                    if row[col_index] == "1":
-                        event_index = 1 + col_index - INDEX_CALENDER_CATEGORY
-                        calender[event_index].append_event(loc_event)
+                    loc_event = OEvent(
+                        loc_name, loc_start_datetime, loc_end_startime)
+                    loc_event.location = loc_location
+                    loc_event.description = loc_description
+
+                    calender[0].append_event(loc_event)
+                    for col_index in range(INDEX_CALENDER_CATEGORY, len(row)):
+                        if row[col_index] == "1":
+                            event_index = 1 + col_index - INDEX_CALENDER_CATEGORY
+                            calender[event_index].append_event(loc_event)
+                except ValueError:
+                    pass
     return calender
 
 
@@ -82,7 +97,7 @@ def write_calenders_json_file(data):
     json_object = json.dumps(data, indent=4)
 
     # Writing to sample.json
-    with open(OUTPUT_DIR+"/"+JSON_NAME, "w") as outfile:
+    with open(OUTPUT_DIR+"/"+JSON_NAME, "w", encoding="utf-8") as outfile:
         outfile.write(json_object)
 
 
@@ -115,12 +130,14 @@ def generate_calenders():
             for cal in calender:
                 print(cal)
                 ics_calender = Calendar()
-                for event in cal.events:
-                    o_event = Event()
-                    o_event.name = event.name
-                    o_event.begin = event.start_datetime
-                    o_event.end = event.end_datetime
-                    ics_calender.events.add(o_event)
+                for o_event in cal.events:
+                    event = Event()
+                    event.name = o_event.name
+                    event.begin = o_event.start_datetime
+                    event.end = o_event.end_datetime
+                    event.description = o_event.description
+                    event.location = o_event.location
+                    ics_calender.events.add(event)
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
                 output_path = calender_output_dir + "/" + ics_file_name
