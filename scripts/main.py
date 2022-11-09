@@ -4,13 +4,14 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
+import json
 from ics import Calendar, Event
 
 from calender import OCalender, OEvent
 
-INPUT_DIR = "input"
-OUTPUT_DIR = "output"
-
+INPUT_DIR = "../input"
+OUTPUT_DIR = "../frontend/public/calenders"
+JSON_NAME = "calenders.json"
 
 INDEX_NAME = 0
 INDEX_START_DATE = 1
@@ -83,17 +84,22 @@ def generate_calenders():
     # create empty outpud directory
     os.makedirs(OUTPUT_DIR)
 
+    calender_names = []
+
     # generate calendars for every csv file
     for filename in os.listdir(INPUT_DIR):
         if filename.endswith(".csv"):
 
             # generate caldender output dir
-            calender_output_dir = OUTPUT_DIR + "/" + filename.split(".")[0]
+            calender_name = filename.split(".")[0]
+            calender_output_dir = OUTPUT_DIR + "/" + calender_name
             os.makedirs(calender_output_dir)
             path = os.path.join(INPUT_DIR, filename)
 
             # parse from
             calender = csv_to_o_calender(path)
+
+            ics_names = []
 
             # generate ics files
             for cal in calender:
@@ -106,10 +112,22 @@ def generate_calenders():
                     o_event.end = event.end_datetime
                     ics_calender.events.add(o_event)
 
-                ics_file_name = calender_output_dir + "/" + \
-                    filename.split(".")[0] + "__"+cal.name + ".ics"
-                with open(ics_file_name, 'w',  encoding="utf-8") as ics_file:
+                ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
+                output_path = calender_output_dir + "/" + ics_file_name
+
+                ics_names.append(ics_file_name)
+                with open(output_path, 'w',  encoding="utf-8") as ics_file:
                     ics_file.writelines(ics_calender.serialize_iter())
+
+            calender_names.append(
+                {"name": calender_name, "calenders": ics_names})
+    # Serializing json
+    json_object = json.dumps(calender_names, indent=4)
+
+    # Writing to sample.json
+    with open(OUTPUT_DIR+"/"+JSON_NAME, "w") as outfile:
+        outfile.write(json_object)
+        print(calender_names)
 
 
 generate_calenders()

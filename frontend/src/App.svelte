@@ -1,10 +1,9 @@
 <script lang="ts">
-  import type { LatestRelease } from "./lib/interfaces";
   import { onMount } from "svelte";
   import ICalParser from "ical-js-parser";
   import type { ICalJSON } from "ical-js-parser";
   import { Styles } from "sveltestrap";
-  import { Col, Row, Button, Icon } from "sveltestrap/src";
+  import { Col, Row, Button, Icon, Alert } from "sveltestrap/src";
 
   interface Event {
     name: string;
@@ -19,8 +18,12 @@
     events: Event[];
   }
 
-  const GITHUB_URL =
-    "https://api.github.com/repos/FelixBetz/smjUlmCalenderGenerator/releases/latest";
+  interface JsonCalender {
+    name: string;
+    calenders: string[];
+  }
+
+  const CALENDER_URL = "calenders/calenders.json";
 
   let calenders: Calender[] = [];
 
@@ -37,35 +40,38 @@
   }
 
   async function dowloadIcsFile(url: string) {
-    const response = await fetch(url,{ mode: 'no-cors'}).then((res) => res.text());
+    const response = await fetch(url).then((res) => res.text());
     return ICalParser.toJSON(response);
   }
 
   async function getCalenderAssets() /*: Promise<TodoItem[]>*/ {
-    const response = await fetch(GITHUB_URL)
+    const response = await fetch(CALENDER_URL)
       .then((res) => res.json())
-      .then(async (res: LatestRelease) => {
-        for (const asset of res.assets) {
-          let cal: Calender = {
-            name: asset.name,
-            url: asset.browser_download_url,
-            events: [],
-          };
-          let icsString: ICalJSON = await dowloadIcsFile(cal.url);
+      .then(async (res: JsonCalender[]) => {
+        for (const calenderGroup of res) {
+          for (const calender of calenderGroup.calenders) {
+            let cal: Calender = {
+              name: calender,
+              url: "calenders/" + calenderGroup.name + "/" + calender,
+              events: [],
+            };
+            let icsString: ICalJSON = await dowloadIcsFile(cal.url);
 
-          for (let event of icsString.events) {
-            cal.events.push({
-              name: event.summary,
-              description: event.description,
-              startDatetime: icsTimestampToDate(event.dtstart.value),
-              endDatetime: icsTimestampToDate(event.dtend.value),
-            });
+            for (let event of icsString.events) {
+              cal.events.push({
+                name: event.summary,
+                description: event.description,
+                startDatetime: icsTimestampToDate(event.dtstart.value),
+                endDatetime: icsTimestampToDate(event.dtend.value),
+              });
+            }
+            calenders[calenders.length] = cal;
           }
-          calenders[calenders.length] = cal;
         }
       })
       .catch((error: Error) => {
         console.log(error);
+        calenders = [];
         return [];
       });
     return response;
@@ -79,6 +85,13 @@
 <Styles />
 <main style="padding: 50px;">
   <h1>SMJ Ulm Kalender</h1>
+
+  {#if calenders.length == 0}
+    <Alert color="danger">
+      <h4 class="alert-heading text-capitalize">Keine Kalender gefunden</h4>
+    </Alert>
+  {/if}
+
   <Row>
     {#each calenders as calender}
       <Col style=" padding: 20px;" sm="4">
