@@ -1,7 +1,7 @@
 """convert csv files into ics files"""
 import os
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import json
