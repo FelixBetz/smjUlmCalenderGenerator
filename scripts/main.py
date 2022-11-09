@@ -7,6 +7,8 @@ from pathlib import Path
 import json
 from ics import Calendar, Event
 
+from ics.grammar.parse import Container, ContentLine
+
 from calender import OCalender, OEvent
 
 INPUT_DIR = "../input"
@@ -147,6 +149,12 @@ def generate_calenders():
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
                 output_path = calender_output_dir + "/" + ics_file_name
+
+                # add calender name property
+                ics_calender.extra.append(ContentLine(
+                    name="X-WR-CALNAME:", value=ics_file_name.split(".")[0]))
+                ics_calender.extra.append(ContentLine(
+                    name="NAME:", value=ics_file_name.split(".")[0]))
 
                 ics_names.append(ics_file_name)
                 with open(output_path, 'w',  encoding="utf-8") as ics_file:
