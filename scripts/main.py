@@ -37,13 +37,16 @@ def rmdir(directory):
         directory.rmdir()
 
 
-def string_to_datetime(arg_date, arg_time):
+def string_to_date(arg_date):
     """convert date string and time string to dateime object"""
-    date = datetime.strptime(arg_date, '%d.%m.%Y').date()
+    return datetime.strptime(arg_date.strip(), '%d.%m.%Y').date()
+
+
+def string_to_time(arg_time):
+    """convert date string and time string to dateime object"""
     if arg_time == "":
-        return date
-    time = datetime.strptime(arg_time, "%H:%M").time()
-    return datetime.combine(date, time)
+        return None
+    return datetime.strptime(arg_time.strip(), "%H:%M").time()
 
 
 def csv_to_o_calender(arg_csv_path):
@@ -63,34 +66,30 @@ def csv_to_o_calender(arg_csv_path):
                 pass
             # parse events properties
             else:
-                try:
-                    loc_name = row[INDEX_NAME].strip()
+                loc_start_datetime = (string_to_date(row[INDEX_START_DATE]),
+                                      string_to_time(row[INDEX_START_TIME]))
 
-                    loc_start_datetime = string_to_datetime(
-                        row[INDEX_START_DATE].strip(),
-                        row[INDEX_START_TIME].strip())
+                loc_end_datetime = (string_to_date(row[INDEX_END_DATE]),
+                                    string_to_time(row[INDEX_END_TIME]))
 
-                    loc_end_startime = string_to_datetime(
-                        row[INDEX_END_DATE].strip(),
-                        row[INDEX_END_TIME].strip())
+                loc_event = OEvent(row[INDEX_NAME].strip(),
+                                   loc_start_datetime,
+                                   loc_end_datetime,
+                                   )
 
-                    loc_event = OEvent(
-                        loc_name, loc_start_datetime, loc_end_startime)
+                loc_event.location = row[INDEX_LOCATION]
+                loc_event.description = row[INDEX_DESCRIPTION]
+                loc_categories = []
+                for cat in row[INDEX_CATEGORIES].split(","):
+                    loc_categories.append(cat.strip())
+                loc_event.categories = loc_categories
 
-                    loc_event.location = row[INDEX_LOCATION]
-                    loc_event.description = row[INDEX_DESCRIPTION]
-                    loc_categories = []
-                    for cat in row[INDEX_CATEGORIES].split(","):
-                        loc_categories.append(cat.strip())
-                    loc_event.categories = loc_categories
+                calender[0].append_event(loc_event)
+                for col_index in range(INDEX_CALENDER, len(row)):
+                    if row[col_index] == "1":
+                        event_index = 1 + col_index - INDEX_CALENDER
+                        calender[event_index].append_event(loc_event)
 
-                    calender[0].append_event(loc_event)
-                    for col_index in range(INDEX_CALENDER, len(row)):
-                        if row[col_index] == "1":
-                            event_index = 1 + col_index - INDEX_CALENDER
-                            calender[event_index].append_event(loc_event)
-                except ValueError:
-                    pass
     return calender
 
 
@@ -131,17 +130,19 @@ def generate_calenders():
 
             # generate ics files
             for cal in calender:
-                print(cal)
                 ics_calender = Calendar(creator="SMJ Ulm/Alb/Donau")
 
                 for o_event in cal.events:
                     event = Event()
                     event.name = o_event.name
-                    event.begin = o_event.start_datetime
-                    event.end = o_event.end_datetime
+                    event.begin = o_event.get_datetime_start()
+                    event.end = o_event.get_datetime_end()
                     event.description = o_event.description
                     event.location = o_event.location
                     event.categories = o_event.categories
+                    if o_event.start_datetime[1] is None or o_event.end_datetime[1] is None:
+                        print("all day", o_event)
+                        # event.make_all_day()
                     ics_calender.events.add(event)
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
@@ -153,6 +154,10 @@ def generate_calenders():
 
             calender_names.append(
                 {"name": calender_name, "calenders": ics_names})
+
+            print("---------------------------------------------------------------")
+            for cal in calender:
+                print(cal)
 
     write_calenders_json_file(calender_names)
 

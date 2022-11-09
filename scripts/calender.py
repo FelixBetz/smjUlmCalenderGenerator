@@ -1,4 +1,5 @@
 """collection of classes for an ics calender"""
+from datetime import datetime
 
 
 class OEvent:
@@ -13,11 +14,23 @@ class OEvent:
         self.categories = ""
 
     def __str__(self):
-        return self.name + ": " + str(self.start_datetime) + " to " + str(self.end_datetime)
+        return self.name + ": " + \
+            str(self.start_datetime[0]) + "," + str(self.start_datetime[1]) + " to "\
+            + str(self.end_datetime[0])+"," + str(self.end_datetime[1])
 
-    def get_duration(self):
-        """returns event"""
-        return self.end_datetime - self.start_datetime
+    def __combine_datetime(self, arg_datetime):
+        """combine date and time as datetime """
+        if arg_datetime[1] is None:
+            return arg_datetime[0]
+        return datetime.combine(arg_datetime[0], arg_datetime[1])
+
+    def get_datetime_start(self):
+        """"combine date and time as datetime"""
+        return self.__combine_datetime(self.start_datetime)
+
+    def get_datetime_end(self):
+        """"combine date and time as datetime"""
+        return self.__combine_datetime(self.end_datetime)
 
 
 class OCalender:
