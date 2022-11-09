@@ -36,7 +36,9 @@
     let minute = icsTimestamp.slice(11, 13);
     let seconds = icsTimestamp.slice(13, 15);
 
-    return new Date(+year, +month-1, +day, +hour, +minute, +seconds);
+    return new Date(
+      Date.UTC(+year, +month - 1, +day, +hour, +minute, +seconds)
+    );
   }
 
   async function dowloadIcsFile(url: string) {

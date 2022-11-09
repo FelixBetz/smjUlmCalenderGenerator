@@ -3,12 +3,9 @@ import os
 import csv
 from datetime import datetime
 from pathlib import Path
-
 import json
 from ics import Calendar, Event
-
-from ics.grammar.parse import Container, ContentLine
-
+from ics.grammar.parse import ContentLine
 from calender import OCalender, OEvent
 
 INPUT_DIR = "../input"
@@ -137,8 +134,8 @@ def generate_calenders():
                 for o_event in cal.events:
                     event = Event()
                     event.name = o_event.name
-                    event.begin = o_event.get_datetime_start()
-                    event.end = o_event.get_datetime_end()
+                    event.begin = o_event.get_datetime_start().astimezone()
+                    event.end = o_event.get_datetime_end().astimezone()
                     event.description = o_event.description
                     event.location = o_event.location
                     event.categories = o_event.categories
