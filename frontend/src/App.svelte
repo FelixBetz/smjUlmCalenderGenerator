@@ -29,14 +29,14 @@
 
   function icsTimestampToDate(icsTimestamp: string) {
     let year = icsTimestamp.slice(0, 4);
-    let month = icsTimestamp.slice(6, 8);
-    let day = icsTimestamp.slice(4, 6);
+    let month = icsTimestamp.slice(4, 6);
+    let day = icsTimestamp.slice(6, 8);
 
     let hour = icsTimestamp.slice(9, 11);
     let minute = icsTimestamp.slice(11, 13);
     let seconds = icsTimestamp.slice(13, 15);
 
-    return new Date(+year, +month, +day, +hour, +minute, +seconds);
+    return new Date(+year, +month-1, +day, +hour, +minute, +seconds);
   }
 
   async function dowloadIcsFile(url: string) {
