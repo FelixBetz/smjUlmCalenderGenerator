@@ -76,6 +76,16 @@ def csv_to_o_calender(arg_csv_path):
     return calender
 
 
+def write_calenders_json_file(data):
+    """gernate caleners.json file"""
+    # Serializing json
+    json_object = json.dumps(data, indent=4)
+
+    # Writing to sample.json
+    with open(OUTPUT_DIR+"/"+JSON_NAME, "w") as outfile:
+        outfile.write(json_object)
+
+
 def generate_calenders():
     """generate calenders for each csv file"""
     # remove old output directory
@@ -121,13 +131,8 @@ def generate_calenders():
 
             calender_names.append(
                 {"name": calender_name, "calenders": ics_names})
-    # Serializing json
-    json_object = json.dumps(calender_names, indent=4)
 
-    # Writing to sample.json
-    with open(OUTPUT_DIR+"/"+JSON_NAME, "w") as outfile:
-        outfile.write(json_object)
-        print(calender_names)
+    write_calenders_json_file(calender_names)
 
 
 generate_calenders()
