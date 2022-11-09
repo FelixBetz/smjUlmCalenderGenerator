@@ -1,7 +1,7 @@
 """convert csv files into ics files"""
 import os
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import json
@@ -20,8 +20,9 @@ INDEX_END_DATE = 3
 INDEX_END_TIME = 4
 INDEX_DESCRIPTION = 5
 INDEX_LOCATION = 6
+INDEX_CATEGORIES = 7
 
-INDEX_CALENDER_CATEGORY = 7
+INDEX_CALENDER = 8
 
 
 def rmdir(directory):
@@ -54,7 +55,7 @@ def csv_to_o_calender(arg_csv_path):
         for row_index, row in enumerate(reader):
             # parse header line
             if row_index == 0:
-                for col_index in range(INDEX_CALENDER_CATEGORY, len(row)):
+                for col_index in range(INDEX_CALENDER, len(row)):
                     calender.append(OCalender(row[col_index]))
 
             # skip empty rows
@@ -73,18 +74,20 @@ def csv_to_o_calender(arg_csv_path):
                         row[INDEX_END_DATE].strip(),
                         row[INDEX_END_TIME].strip())
 
-                    loc_description = row[INDEX_DESCRIPTION]
-                    loc_location = row[INDEX_LOCATION]
-
                     loc_event = OEvent(
                         loc_name, loc_start_datetime, loc_end_startime)
-                    loc_event.location = loc_location
-                    loc_event.description = loc_description
+
+                    loc_event.location = row[INDEX_LOCATION]
+                    loc_event.description = row[INDEX_DESCRIPTION]
+                    loc_categories = []
+                    for cat in row[INDEX_CATEGORIES].split(","):
+                        loc_categories.append(cat.strip())
+                    loc_event.categories = loc_categories
 
                     calender[0].append_event(loc_event)
-                    for col_index in range(INDEX_CALENDER_CATEGORY, len(row)):
+                    for col_index in range(INDEX_CALENDER, len(row)):
                         if row[col_index] == "1":
-                            event_index = 1 + col_index - INDEX_CALENDER_CATEGORY
+                            event_index = 1 + col_index - INDEX_CALENDER
                             calender[event_index].append_event(loc_event)
                 except ValueError:
                     pass
@@ -137,6 +140,7 @@ def generate_calenders():
                     event.end = o_event.end_datetime
                     event.description = o_event.description
                     event.location = o_event.location
+                    event.categories = o_event.categories
                     ics_calender.events.add(event)
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
