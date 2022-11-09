@@ -132,7 +132,8 @@ def generate_calenders():
             # generate ics files
             for cal in calender:
                 print(cal)
-                ics_calender = Calendar()
+                ics_calender = Calendar(creator="SMJ Ulm/Alb/Donau")
+
                 for o_event in cal.events:
                     event = Event()
                     event.name = o_event.name
