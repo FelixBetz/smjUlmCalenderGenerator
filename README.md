@@ -8,3 +8,5 @@ generates calender for the SMJ Ulm/Alb/Donau events
 ## setup
 `pip install ics`
 
+## csv input
+repeat: daily, weekly, monthly, yearly

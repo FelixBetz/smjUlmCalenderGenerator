@@ -11,6 +11,8 @@
     startDatetime: Date;
     endDatetime: Date;
     isAllDay: boolean;
+    repeatStr: string;
+    repeatUntil: Date;
   }
 
   interface Calender {
@@ -27,6 +29,21 @@
   const CALENDER_URL = "calenders/calenders.json";
 
   let calenders: Calender[] = [];
+
+  function repeatStringToGerman(str: string) {
+    switch (str) {
+      case "DAILY":
+        return "täglich";
+      case "WEEKLY":
+        return "wöchentlich";
+      case "MONTHLY":
+        return "monatlich";
+      case "YEARLY":
+        return "jährlich";
+      default:
+        return "";
+    }
+  }
 
   function dateMinusOneDay(date: Date) {
     const dayInMillisenconds = 1000 * 60 * 60 * 24; //*1000ms * 60s * 60min *24h = 1 Day
@@ -76,12 +93,24 @@
               if (event.dtend == undefined) {
                 event.dtend = event.dtstart;
               }
+
+              let repeatStr = "";
+              let repeatUntil = null;
+              if (event.rrule != undefined) {
+                //format of rrule: FREQ=MONTHLY;UNTIL=20230201T235959Z
+                let repeatSplit = event.rrule.split(";");
+                repeatStr = repeatStringToGerman(repeatSplit[0].split("=")[1]);
+                repeatUntil = icsTimestampToDate(repeatSplit[1].split("=")[1]);
+              }
+
               cal.events.push({
                 name: event.summary,
                 description: event.description,
                 startDatetime: icsTimestampToDate(event.dtstart.value),
                 endDatetime: icsTimestampToDate(event.dtend.value),
                 isAllDay: event.dtstart.isAllDay,
+                repeatStr: repeatStr,
+                repeatUntil: repeatUntil,
               });
             }
             calenders[calenders.length] = cal;
@@ -140,7 +169,10 @@
                     event.endDatetime
                   )} Uhr
                 {/if}
-
+                {#if event.repeatUntil != null}
+                  <br />
+                  wiederholt sich {event.repeatStr}( bis {event.repeatUntil.toLocaleDateString()})
+                {/if}
                 {#if event.description != undefined}
                   <br />
                   <i> {event.description}</i>

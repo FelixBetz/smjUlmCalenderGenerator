@@ -17,11 +17,13 @@ INDEX_START_DATE = 1
 INDEX_START_TIME = 2
 INDEX_END_DATE = 3
 INDEX_END_TIME = 4
-INDEX_DESCRIPTION = 5
-INDEX_LOCATION = 6
-INDEX_CATEGORIES = 7
+INDEX_REPEAT = 5
+INDEX_REPEAT_UNTIL = 6
+INDEX_DESCRIPTION = 7
+INDEX_LOCATION = 8
+INDEX_CATEGORIES = 9
 
-INDEX_CALENDER = 8
+INDEX_CALENDER = 10
 
 
 def rmdir(directory):
@@ -48,6 +50,19 @@ def string_to_time(arg_time):
     if arg_time == "":
         return None
     return datetime.strptime(arg_time.strip(), "%H:%M").time()
+
+
+def parse_repeat(arg_repeat, arg_repeat_until):
+    """returns tuple for repeat event"""
+    arg_repeat = arg_repeat.upper()
+    if arg_repeat not in ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]:
+        return None
+
+    loc_repeat_until = string_to_date(arg_repeat_until)
+    if loc_repeat_until is None:
+        return None
+
+    return (arg_repeat, loc_repeat_until)
 
 
 def csv_to_o_calender(arg_csv_path):
@@ -78,6 +93,8 @@ def csv_to_o_calender(arg_csv_path):
                                    loc_end_datetime,
                                    )
 
+                loc_event.repeat = parse_repeat(row[INDEX_REPEAT].strip(),
+                                                row[INDEX_REPEAT_UNTIL].strip())
                 loc_event.location = row[INDEX_LOCATION]
                 loc_event.description = row[INDEX_DESCRIPTION]
                 loc_categories = []
@@ -141,13 +158,13 @@ def generate_calenders():
                     event.location = o_event.location
                     event.categories = o_event.categories
 
-                    # kein Endatum
+                    # no enddate => ignore time
                     if o_event.get_datetime_end() is None:
                         event.begin = o_event.start_datetime[0]
                         event.end = o_event.start_datetime[0]
                         event.make_all_day()
 
-                    # only start and end date => no time
+                    # only dates, but no time
                     elif o_event.start_datetime[1] is None or o_event.end_datetime[1] is None:
                         event.begin = o_event.start_datetime[0]
                         event.end = o_event.end_datetime[0]
@@ -157,6 +174,11 @@ def generate_calenders():
                         event.begin = o_event.get_datetime_start()
                         event.end = o_event.get_datetime_end()
                     ics_calender.events.add(event)
+
+                    if o_event.repeat is not None:
+                        event.extra.append(ContentLine(name="RRULE",
+                                                       value="FREQ="+o_event.get_repeat() +
+                                                       ";UNTIL="+o_event.get_repeat_until_str()))
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
                 output_path = calender_output_dir + "/" + ics_file_name

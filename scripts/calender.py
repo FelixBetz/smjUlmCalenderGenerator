@@ -12,6 +12,7 @@ class OEvent:
         self.description = ""
         self.location = ""
         self.categories = ""
+        self.repeat = None
 
     def __str__(self):
         return self.name + ": " + \
@@ -33,6 +34,17 @@ class OEvent:
     def get_datetime_end(self):
         """"combine date and time as datetime"""
         return self.__combine_datetime(self.end_datetime)
+
+    def get_repeat(self):
+        """returns repeat freq"""
+        return self.repeat[0]
+
+    def get_repeat_until_str(self):
+        """returns repeat until as ics date string"""
+        year = str(self.repeat[1].year).zfill(4)
+        month = str(self.repeat[1].month).zfill(2)
+        day = str(self.repeat[1].day).zfill(2)
+        return year+month+day+"T"+"235959Z"
 
 
 class OCalender:

@@ -1,6 +1,10 @@
-Name;StartDate;StartTime;EndDate;EndTime;description;location;categories;LeiterZeltlager;Teilnehmer
-test1;06.11.2022;13:00;06.11.2022;14:00;desc;;Abteilung;;
-test2;07.11.2022;01:00;08.11.2022;23:00;;Baustetten;Zeltlager;1;1
-test3;09.11.2022;;09.11.2022;;desc;Baustetten;ITE, Zeltlager;1;
-test4;10.11.2022;;12.11.2022;;;;;;
-test5;13.11.2022;;;;;;;;
+Name;StartDate;StartTime;EndDate;EndTime;Repeat;RepeatUntil;description;location;categories;LeiterZeltlager;Teilnehmer
+test1;06.11.2022;13:00;06.11.2022;14:00;;;desc;;Abteilung;;
+test2;07.11.2022;01:00;08.11.2022;23:00;;;;Baustetten;Zeltlager;;
+test3;09.11.2022;;09.11.2022;;;;desc;Baustetten;ITE, Zeltlager;;
+test4;10.11.2022;;12.11.2022;;;;;;;1;
+test5;13.11.2022;;;;;;;;;;
+test6;10.11.2022;;11.11.2022;;;;;;;1;
+test7;01.01.2023;18:00;01.01.2023;20:00;monthly;01.02.2023;;;;1;1
+test8;18.11.2022;18:00;19.11.2022;20:00;yearly;01.02.2029;;;;;1
+test9;07.11.2022;;08.11.2022;;monthly;01.02.2023;;;;;1
