@@ -113,6 +113,12 @@
                 repeatUntil: repeatUntil,
               });
             }
+
+            //sort events by startDatetime
+            cal.events.sort((a: Event, b: Event) =>
+              a.startDatetime < b.startDatetime ? -1 : 1
+            );
+
             calenders[calenders.length] = cal;
           }
         }
