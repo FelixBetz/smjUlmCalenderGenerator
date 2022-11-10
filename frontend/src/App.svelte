@@ -10,6 +10,7 @@
     description: string;
     startDatetime: Date;
     endDatetime: Date;
+    isAllDay: boolean;
   }
 
   interface Calender {
@@ -26,6 +27,18 @@
   const CALENDER_URL = "calenders/calenders.json";
 
   let calenders: Calender[] = [];
+
+  function dateMinusOneDay(date: Date) {
+    const dayInMillisenconds = 1000 * 60 * 60 * 24; //*1000ms * 60s * 60min *24h = 1 Day
+    return new Date(date.getTime() - dayInMillisenconds);
+  }
+
+  function formatTime(date: Date) {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
   function icsTimestampToDate(icsTimestamp: string) {
     let year = icsTimestamp.slice(0, 4);
@@ -60,11 +73,15 @@
             let icsString: ICalJSON = await dowloadIcsFile(cal.url);
 
             for (let event of icsString.events) {
+              if (event.dtend == undefined) {
+                event.dtend = event.dtstart;
+              }
               cal.events.push({
                 name: event.summary,
                 description: event.description,
                 startDatetime: icsTimestampToDate(event.dtstart.value),
                 endDatetime: icsTimestampToDate(event.dtend.value),
+                isAllDay: event.dtstart.isAllDay,
               });
             }
             calenders[calenders.length] = cal;
@@ -109,26 +126,24 @@
             {#each calender.events as event}
               <li>
                 <strong>{event.name}</strong>:<br />
-
-                {event.startDatetime.toLocaleDateString()}
-                {#if event.endDatetime.getHours() != 0}
-                  , {event.startDatetime.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })} Uhr{/if}
-                <i>bis</i> <br />
-
-                {event.endDatetime.toLocaleDateString()}
-
-                {#if event.endDatetime.getHours() != 0}
-                  , {event.endDatetime.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })} Uhr
+                {event.startDatetime.toLocaleDateString()}{#if event.isAllDay}
+                  {#if event.startDatetime.toLocaleDateString() != event.endDatetime.toLocaleDateString()}
+                    <i>&nbsp;bis</i>
+                    {dateMinusOneDay(event.endDatetime).toLocaleDateString()}
+                  {/if}
+                {:else if event.startDatetime.toLocaleDateString() == event.endDatetime.toLocaleDateString()}
+                  , {formatTime(event.startDatetime)} <i>bis</i>
+                  {formatTime(event.endDatetime)} Uhr
+                {:else}
+                  , {formatTime(event.startDatetime)} Uhr <i>bis</i> <br />
+                  {event.endDatetime.toLocaleDateString()}, {formatTime(
+                    event.endDatetime
+                  )} Uhr
                 {/if}
+
                 {#if event.description != undefined}
                   <br />
-                  {event.description}
+                  <i> {event.description}</i>
                 {/if}
               </li>
             {/each}
