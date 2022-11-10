@@ -154,7 +154,6 @@ def generate_calenders():
                 for o_event in cal.events:
                     event = Event()
                     event.name = o_event.name
-                    print(event.name)
                     event.description = o_event.description
                     event.location = o_event.location
                     event.categories = o_event.categories
