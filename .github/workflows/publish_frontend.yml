@@ -53,6 +53,7 @@ jobs:
       - name: replace asset url
         run : |
            sed -i 's!assets!smjUlmCalenderGenerator/assets!' ./frontend/dist/index.html
+           sed -i 's!/favicon.png"!smjUlmCalenderGenerator/favicon.png"!' ./frontend/dist/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
