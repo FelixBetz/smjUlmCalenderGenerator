@@ -1,6 +1,7 @@
 """convert csv files into ics files"""
 import os
 import csv
+import codecs
 from datetime import datetime
 from pathlib import Path
 import json
@@ -69,7 +70,7 @@ def csv_to_o_calender(arg_csv_path):
     """converts csv file to OCalender[]"""
     calender = []
     calender.append(OCalender("gesamt"))
-    with open(arg_csv_path, newline='', encoding="utf-8") as csvfile:
+    with codecs.open(arg_csv_path,  encoding="latin-1", errors='ignore') as csvfile:
         reader = csv.reader(csvfile, delimiter=";")
         for row_index, row in enumerate(reader):
             # parse header line
@@ -117,7 +118,7 @@ def write_calenders_json_file(data):
     json_object = json.dumps(data, indent=4)
 
     # Writing to sample.json
-    with open(OUTPUT_DIR+"/"+JSON_NAME, "w", encoding="utf-8") as outfile:
+    with codecs.open(OUTPUT_DIR+"/"+JSON_NAME, "w", encoding="latin-1", errors='ignore') as outfile:
         outfile.write(json_object)
 
 
@@ -190,7 +191,7 @@ def generate_calenders():
                     name="NAME:", value=ics_file_name.split(".")[0]))
 
                 ics_names.append(ics_file_name)
-                with open(output_path, 'w',  encoding="utf-8") as ics_file:
+                with codecs.open(output_path, 'w', encoding="latin-1", errors='ignore') as ics_file:
                     ics_file.writelines(ics_calender.serialize_iter())
 
             calender_names.append(
