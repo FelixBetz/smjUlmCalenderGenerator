@@ -22,7 +22,10 @@
     "vite": "^3.2.3"
   },
   "dependencies": {
+    "@types/filesaver": "^0.0.30",
+    "file-saver": "^2.0.5",
     "ical-js-parser": "^0.7.0",
+    "jszip": "^3.10.1",
     "svelte": "^3.52.0",
     "sveltestrap": "^5.10.0"
   }

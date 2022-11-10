@@ -4,6 +4,8 @@
   import type { ICalJSON } from "ical-js-parser";
   import { Styles } from "sveltestrap";
   import { Col, Row, Button, Icon, Alert } from "sveltestrap/src";
+  import JSZip from "jszip";
+  import FileSaver from "file-saver";
 
   interface Event {
     name: string;
@@ -26,9 +28,25 @@
     calenders: string[];
   }
 
+  interface ZipFile {
+    name: string;
+    content: string;
+  }
+
   const CALENDER_URL = "calenders/calenders.json";
 
   let calenders: Calender[] = [];
+  let zipFiles: ZipFile[] = [];
+
+  async function generateZipFile() {
+    const zip = new JSZip();
+    for (const file of zipFiles) {
+      zip.file(file.name, file.content);
+    }
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      FileSaver.saveAs(content, "download.zip");
+    });
+  }
 
   function repeatStringToGerman(str: string) {
     switch (str) {
@@ -73,10 +91,12 @@
 
   async function dowloadIcsFile(url: string) {
     const response = await fetch(url).then((res) => res.text());
+    zipFiles.push({ name: url, content: response });
     return ICalParser.toJSON(response);
   }
 
   async function getCalenderAssets() /*: Promise<TodoItem[]>*/ {
+    zipFiles = [];
     const response = await fetch(CALENDER_URL)
       .then((res) => res.json())
       .then(async (res: JsonCalender[]) => {
@@ -139,7 +159,7 @@
 <Styles />
 <main style="padding: 50px;">
   <h1>SMJ Ulm Kalender</h1>
-
+  <Button on:click={generateZipFile}>Alle Kalender herunterladen</Button>
   {#if calenders.length == 0}
     <Alert color="danger">
       <h4 class="alert-heading text-capitalize">Keine Kalender gefunden</h4>
