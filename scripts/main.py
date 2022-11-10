@@ -38,6 +38,8 @@ def rmdir(directory):
 
 def string_to_date(arg_date):
     """convert date string and time string to dateime object"""
+    if arg_date == "":
+        return None
     return datetime.strptime(arg_date.strip(), '%d.%m.%Y').date()
 
 
@@ -134,14 +136,26 @@ def generate_calenders():
                 for o_event in cal.events:
                     event = Event()
                     event.name = o_event.name
-                    event.begin = o_event.get_datetime_start().astimezone()
-                    event.end = o_event.get_datetime_end().astimezone()
+
                     event.description = o_event.description
                     event.location = o_event.location
                     event.categories = o_event.categories
-                    if o_event.start_datetime[1] is None or o_event.end_datetime[1] is None:
-                        print("all day", o_event)
-                        # event.make_all_day()
+
+                    # kein Endatum
+                    if o_event.get_datetime_end() is None:
+                        event.begin = o_event.start_datetime[0]
+                        event.end = o_event.start_datetime[0]
+                        event.make_all_day()
+
+                    # only start and end date => no time
+                    elif o_event.start_datetime[1] is None or o_event.end_datetime[1] is None:
+                        event.begin = o_event.start_datetime[0]
+                        event.end = o_event.end_datetime[0]
+                        event.make_all_day()
+                    # rest
+                    else:
+                        event.begin = o_event.get_datetime_start()
+                        event.end = o_event.get_datetime_end()
                     ics_calender.events.add(event)
 
                 ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"

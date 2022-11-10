@@ -20,9 +20,11 @@ class OEvent:
 
     def __combine_datetime(self, arg_datetime):
         """combine date and time as datetime """
+        if arg_datetime[0] is None:
+            return None
         if arg_datetime[1] is None:
-            return datetime.combine(arg_datetime[0], datetime.min.time())
-        return datetime.combine(arg_datetime[0], arg_datetime[1])
+            return datetime.combine(arg_datetime[0], datetime.min.time()).astimezone()
+        return datetime.combine(arg_datetime[0], arg_datetime[1]).astimezone()
 
     def get_datetime_start(self):
         """"combine date and time as datetime"""
