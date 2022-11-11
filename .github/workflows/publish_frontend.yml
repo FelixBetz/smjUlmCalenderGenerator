@@ -44,8 +44,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install ics
       - name: generate calenders
-        run: |
-          cd scripts && python main.py
+        with: 
+          tz: 1
+          run: |
+            cd scripts && python main.py
            
       - name: Install dependencies
         run: |
