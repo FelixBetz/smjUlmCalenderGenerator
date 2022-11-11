@@ -158,8 +158,12 @@
 
 <Styles />
 <main style="padding: 50px;">
-  <h1>SMJ Ulm Kalender</h1>
-  <Button on:click={generateZipFile}>Alle Kalender herunterladen</Button>
+  <h1>
+    SMJ Ulm Kalender <Icon name="calendar-date" />
+    {#if zipFiles.length > 0}
+      <Button on:click={generateZipFile}>Alle Kalender herunterladen</Button>
+    {/if}
+  </h1>
   {#if calenders.length == 0}
     <Alert color="danger">
       <h4 class="alert-heading text-capitalize">Keine Kalender gefunden</h4>
