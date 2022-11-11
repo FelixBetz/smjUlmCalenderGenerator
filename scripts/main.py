@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import json
 from ics import Calendar, Event
-from ics.grammar.parse import ContentLine
+from ics.grammar.parse import ContentLine, Container
 from calender import OCalender, OEvent
 
 INPUT_DIR = "../input"
@@ -122,6 +122,47 @@ def write_calenders_json_file(data):
         outfile.write(json_object)
 
 
+def replace_timezone(data):
+    """adds timesone to ics datestring"""
+    # data = data.replace(
+    #    "DTSTART;", "DTSTART;TZID=\"W. Europe Standard Time\":")
+    data = data.replace(
+        "DTSTART:", "DTSTART;TZID=\"W. Europe Standard Time\":")
+    # data = data.replace(
+    #   "DTEND;", "DTEND;TZID=\"W. Europe Standard Time\":")
+    data = data.replace(
+        "DTEND:", "DTEND;TZID=\"W. Europe Standard Time\":")
+    return data
+
+
+def get_ics_timezone_container():
+    """get timezone contaier"""
+    c_standard = Container(name="STANDARD")
+
+    c_standard.append(ContentLine(
+        "DTSTART", value="16011028T030000"))
+    c_standard.append(ContentLine(
+        "RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"))
+    c_standard.append(ContentLine("TZOFFSETFROM", value="+0200"))
+    c_standard.append(ContentLine("TZOFFSETTO", value="+0100"))
+
+    c_daylight = Container(name="DAYLIGHT")
+    c_daylight.append(ContentLine(
+        "DTSTART", value="16010325T020000"))
+    c_daylight.append(ContentLine(
+        "RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"))
+    c_daylight.append(ContentLine("TZOFFSETFROM", value="+0100"))
+    c_daylight.append(ContentLine("TZOFFSETTO", value="+0200"))
+
+    c_timezone = Container(name="VTIMEZONE")
+    c_timezone.append(ContentLine(
+        "TZID", value="W. Europe Standard Time"))
+    c_timezone.append(c_standard)
+    c_timezone.append(c_daylight)
+
+    return c_timezone
+
+
 def generate_calenders():
     """generate calenders for each csv file"""
     # remove old output directory
@@ -150,6 +191,7 @@ def generate_calenders():
             # generate ics files
             for cal in calender:
                 ics_calender = Calendar(creator="SMJ Ulm/Alb/Donau")
+                ics_calender.extra.append(get_ics_timezone_container())
 
                 for o_event in cal.events:
                     event = Event()
@@ -191,7 +233,8 @@ def generate_calenders():
 
                 ics_names.append(ics_file_name)
                 with codecs.open(output_path, 'w', encoding="utf-8", errors='ignore') as ics_file:
-                    ics_file.writelines(ics_calender.serialize_iter())
+                    ics_file.writelines(
+                        map(replace_timezone, ics_calender.serialize_iter()))
 
             calender_names.append(
                 {"name": calender_name, "calenders": ics_names})
