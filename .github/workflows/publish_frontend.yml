@@ -28,6 +28,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: set timezone
+        uses: szenius/set-timezone@v1.0
+          with:
+            timezoneLinux: "Europe/Berlin"
       - name: Ouput Time zone
         run: |
           timedatectl
@@ -44,10 +48,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install ics
       - name: generate calenders
-        with: 
-          tz: 1
-          run: |
-            cd scripts && python main.py
+        run: |
+          cd scripts && python main.py
            
       - name: Install dependencies
         run: |
