@@ -90,8 +90,9 @@
   }
 
   async function dowloadIcsFile(url: string) {
-    const response = await fetch(url).then((res) => res.text());
+    let response = await fetch(url).then((res) => res.text());
     zipFiles.push({ name: url, content: response });
+    response = response.replaceAll(';TZID="W. Europe Standard Time"', "");
     return ICalParser.toJSON(response);
   }
 
