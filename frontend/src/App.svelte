@@ -3,35 +3,16 @@
   import ICalParser from "ical-js-parser";
   import type { ICalJSON } from "ical-js-parser";
   import { Styles } from "sveltestrap";
-  import { Col, Row, Button, Icon, Alert } from "sveltestrap/src";
+  import { Row, Button, Icon, Alert } from "sveltestrap/src";
   import JSZip from "jszip";
   import FileSaver from "file-saver";
-
-  interface Event {
-    name: string;
-    description: string;
-    startDatetime: Date;
-    endDatetime: Date;
-    isAllDay: boolean;
-    repeatStr: string;
-    repeatUntil: Date;
-  }
-
-  interface Calender {
-    name: string;
-    url: string;
-    events: Event[];
-  }
-
-  interface JsonCalender {
-    name: string;
-    calenders: string[];
-  }
-
-  interface ZipFile {
-    name: string;
-    content: string;
-  }
+  import type {
+    Calender,
+    ZipFile,
+    Event,
+    JsonCalender,
+  } from "./lib/interfaces";
+  import CCalender from "./lib/cCalender.svelte";
 
   const CALENDER_URL = "calenders/calenders.json";
 
@@ -61,18 +42,6 @@
       default:
         return "";
     }
-  }
-
-  function dateMinusOneDay(date: Date) {
-    const dayInMillisenconds = 1000 * 60 * 60 * 24; //*1000ms * 60s * 60min *24h = 1 Day
-    return new Date(date.getTime() - dayInMillisenconds);
-  }
-
-  function formatTime(date: Date) {
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   }
 
   function icsTimestampToDate(icsTimestamp: string) {
@@ -162,7 +131,9 @@
   <h1>
     SMJ Ulm Kalender <Icon name="calendar-date" />
     {#if zipFiles.length > 0}
-      <Button on:click={generateZipFile}>Alle Kalender herunterladen</Button>
+      <Button color="primary" on:click={generateZipFile}
+        >Alle Kalender herunterladen</Button
+      >
     {/if}
   </h1>
   {#if calenders.length == 0}
@@ -173,46 +144,7 @@
 
   <Row>
     {#each calenders as calender}
-      <Col style=" padding: 20px;" sm="4">
-        <div style="border: 1px solid black; padding: 10px">
-          <h5>
-            {calender.name}
-            <a href={calender.url}>
-              <Button>Download <Icon name="download" /></Button>
-            </a>
-          </h5>
-
-          <ul>
-            {#each calender.events as event}
-              <li>
-                <strong>{event.name}</strong>:<br />
-                {event.startDatetime.toLocaleDateString()}{#if event.isAllDay}
-                  {#if event.startDatetime.toLocaleDateString() != event.endDatetime.toLocaleDateString()}
-                    <i>&nbsp;bis</i>
-                    {dateMinusOneDay(event.endDatetime).toLocaleDateString()}
-                  {/if}
-                {:else if event.startDatetime.toLocaleDateString() == event.endDatetime.toLocaleDateString()}
-                  , {formatTime(event.startDatetime)} <i>bis</i>
-                  {formatTime(event.endDatetime)} Uhr
-                {:else}
-                  , {formatTime(event.startDatetime)} Uhr <i>bis</i> <br />
-                  {event.endDatetime.toLocaleDateString()}, {formatTime(
-                    event.endDatetime
-                  )} Uhr
-                {/if}
-                {#if event.repeatUntil != null}
-                  <br />
-                  wiederholt sich {event.repeatStr}( bis {event.repeatUntil.toLocaleDateString()})
-                {/if}
-                {#if event.description != undefined}
-                  <br />
-                  <i> {event.description}</i>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-        </div>
-      </Col>
+      <CCalender {calender} />
     {/each}
   </Row>
 </main>
