@@ -43,14 +43,15 @@
           <div class="row justify-content-md-center">
             <a href={calender.url}>
               <Button outline color="primary">
-                {calender.name} <Icon name="download" /></Button
-              >
+                {calender.name}
+                <Icon name="download" />
+              </Button>
             </a>
           </div>
         </div>
       {/each}
       <div class="col-md-auto tabs_wrap">
-        <Button outline color="primary" on:click={generateZipFile}>
+        <Button color="secondary" on:click={generateZipFile}>
           Alle Kalender herunterladen <Icon name="download" /></Button
         >
       </div>
@@ -59,7 +60,10 @@
 
   <hr style="12px solid black" />
 
-  <div class="row justify-content-md-center sticky-top" style="background-color: white; padding: 10px">
+  <div
+    class="row justify-content-md-center sticky-top"
+    style="background-color:  rgba(255,255,255,0.5); padding: 10px"
+  >
     <div class="col-md-auto tabs_wrap">
       <ul>
         {#each calenders as calender, i}
@@ -129,8 +133,6 @@
     background: #0d6efd;
     color: #fff;
   }
-
-
 
   .sketchy {
     padding: 1rem 2rem;

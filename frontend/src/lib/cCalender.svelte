@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Col, Row} from "sveltestrap/src";
+  import { Col, Row } from "sveltestrap/src";
   import type { Calender, Event } from "./interfaces";
 
   export let calender: Calender = null;
