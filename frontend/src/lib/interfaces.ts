@@ -1,3 +1,5 @@
+import type { ICalJSON } from "ical-js-parser";
+
 export interface Event {
   name: string;
   description: string;
@@ -12,14 +14,10 @@ export interface Calender {
   name: string;
   url: string;
   events: Event[];
-}
-
-export interface JsonCalender {
-  name: string;
-  calenders: string[];
-}
-
-export interface ZipFile {
-  name: string;
   content: string;
+}
+
+export interface IcsFile {
+  content: string;
+  json: ICalJSON;
 }

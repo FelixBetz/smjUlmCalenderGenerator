@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Col, Row, Button, Icon } from "sveltestrap/src";
-
+  import { Col, Row} from "sveltestrap/src";
   import type { Calender, Event } from "./interfaces";
 
   export let calender: Calender = null;
+  export let style = "";
 
   function dateMinusOneDay(date: Date) {
     const dayInMillisenconds = 1000 * 60 * 60 * 24; //*1000ms * 60s * 60min *24h = 1 Day
@@ -38,19 +38,13 @@
   }
 </script>
 
-<div>
-  <h5>
-    {calender.name}
-    <a href={calender.url}>
-      <Button color="primary">Download <Icon name="download" /></Button>
-    </a>
-  </h5>
+<div {style}>
   {#each calender.events as event}
     <Row>
-      <Col sm="2">
+      <Col sm="3">
         <strong>{event.name}</strong>
       </Col>
-      <Col sm="2">
+      <Col sm="3">
         <strong>{event.startDatetime.toLocaleDateString()}</strong>,
         {dayStringByDate(event.startDatetime)}
 
@@ -88,7 +82,7 @@
           {formatTime(event.endDatetime)} Uhr
         {/if}
       </Col>
-      <Col sm="6">
+      <Col sm="4">
         {#if event.description != undefined}
           {event.description}
         {/if}
