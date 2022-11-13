@@ -32,11 +32,11 @@
 <Styles />
 
 <main>
-  <div style="text-align: center; margin-bottom: 30px">
+  <div class="d-print-none" style="text-align: center; margin-bottom: 30px">
     <div class="sketchy">SMJ Ulm/Alb/Donau Kalender</div>
   </div>
 
-  <div class="row justify-content-md-center">
+  <div class="row justify-content-md-center d-print-none">
     {#if calenders.length > 0}
       {#each calenders as calender}
         <div class="col-md-auto tabs_wrap">
@@ -61,7 +61,7 @@
   <hr style="12px solid black" />
 
   <div
-    class="row justify-content-md-center sticky-top"
+    class="row justify-content-md-center sticky-top d-print-none"
     style="background-color:  rgba(255,255,255,0.5); padding: 10px"
   >
     <div class="col-md-auto tabs_wrap">
