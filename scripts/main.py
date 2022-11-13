@@ -69,7 +69,7 @@ def parse_repeat(arg_repeat, arg_repeat_until):
 def csv_to_o_calender(arg_csv_path):
     """converts csv file to OCalender[]"""
     calender = []
-    calender.append(OCalender("gesamt"))
+    calender.append(OCalender("Gesamt"))
     with codecs.open(arg_csv_path,  encoding="utf-8", errors='ignore') as csvfile:
         reader = csv.reader(csvfile, delimiter=";")
         for row_index, row in enumerate(reader):
