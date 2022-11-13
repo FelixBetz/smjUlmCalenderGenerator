@@ -57,7 +57,9 @@
       </div>
     {/if}
   </div>
-
+  {#if calenders.length > 0}
+    <h1 class="d-print-block">{calenders[activeTabId].name}</h1>
+  {/if}
   <hr style="12px solid black" />
 
   <div
