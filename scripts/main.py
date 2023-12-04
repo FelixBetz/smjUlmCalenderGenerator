@@ -43,7 +43,7 @@ def string_to_date(arg_date):
     """convert date string and time string to dateime object"""
     if arg_date == "":
         return None
-    return datetime.strptime(arg_date.strip(), '%d.%m.%Y').date()
+    return datetime.strptime(arg_date.strip(), "%d.%m.%Y").date()
 
 
 def string_to_time(arg_time):
@@ -70,7 +70,7 @@ def csv_to_o_calender(arg_csv_path):
     """converts csv file to OCalender[]"""
     calender = []
     calender.append(OCalender("Gesamt"))
-    with codecs.open(arg_csv_path,  encoding="utf-8", errors='ignore') as csvfile:
+    with codecs.open(arg_csv_path, encoding="utf-8", errors="ignore") as csvfile:
         reader = csv.reader(csvfile, delimiter=";")
         for row_index, row in enumerate(reader):
             # parse header line
@@ -83,19 +83,25 @@ def csv_to_o_calender(arg_csv_path):
                 pass
             # parse events properties
             else:
-                loc_start_datetime = (string_to_date(row[INDEX_START_DATE]),
-                                      string_to_time(row[INDEX_START_TIME]))
+                loc_start_datetime = (
+                    string_to_date(row[INDEX_START_DATE]),
+                    string_to_time(row[INDEX_START_TIME]),
+                )
 
-                loc_end_datetime = (string_to_date(row[INDEX_END_DATE]),
-                                    string_to_time(row[INDEX_END_TIME]))
+                loc_end_datetime = (
+                    string_to_date(row[INDEX_END_DATE]),
+                    string_to_time(row[INDEX_END_TIME]),
+                )
 
-                loc_event = OEvent(row[INDEX_NAME].strip(),
-                                   loc_start_datetime,
-                                   loc_end_datetime,
-                                   )
+                loc_event = OEvent(
+                    row[INDEX_NAME].strip(),
+                    loc_start_datetime,
+                    loc_end_datetime,
+                )
 
-                loc_event.repeat = parse_repeat(row[INDEX_REPEAT].strip(),
-                                                row[INDEX_REPEAT_UNTIL].strip())
+                loc_event.repeat = parse_repeat(
+                    row[INDEX_REPEAT].strip(), row[INDEX_REPEAT_UNTIL].strip()
+                )
                 loc_event.location = row[INDEX_LOCATION]
                 loc_event.description = row[INDEX_DESCRIPTION]
                 loc_categories = []
@@ -118,7 +124,9 @@ def write_calenders_json_file(data):
     json_object = json.dumps(data, indent=4)
 
     # Writing to sample.json
-    with codecs.open(OUTPUT_DIR+"/"+JSON_NAME, "w", encoding="utf-8", errors='ignore') as outfile:
+    with codecs.open(
+        OUTPUT_DIR + "/" + JSON_NAME, "w", encoding="utf-8", errors="ignore"
+    ) as outfile:
         outfile.write(json_object)
 
 
@@ -126,12 +134,10 @@ def replace_timezone(data):
     """adds timesone to ics datestring"""
     # data = data.replace(
     #    "DTSTART;", "DTSTART;TZID=\"W. Europe Standard Time\":")
-    data = data.replace(
-        "DTSTART:", "DTSTART;TZID=\"W. Europe Standard Time\":")
+    data = data.replace("DTSTART:", 'DTSTART;TZID="W. Europe Standard Time":')
     # data = data.replace(
     #   "DTEND;", "DTEND;TZID=\"W. Europe Standard Time\":")
-    data = data.replace(
-        "DTEND:", "DTEND;TZID=\"W. Europe Standard Time\":")
+    data = data.replace("DTEND:", 'DTEND;TZID="W. Europe Standard Time":')
     return data
 
 
@@ -139,24 +145,19 @@ def get_ics_timezone_container():
     """get timezone contaier"""
     c_standard = Container(name="STANDARD")
 
-    c_standard.append(ContentLine(
-        "DTSTART", value="16011028T030000"))
-    c_standard.append(ContentLine(
-        "RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"))
+    c_standard.append(ContentLine("DTSTART", value="16011028T030000"))
+    c_standard.append(ContentLine("RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"))
     c_standard.append(ContentLine("TZOFFSETFROM", value="+0200"))
     c_standard.append(ContentLine("TZOFFSETTO", value="+0100"))
 
     c_daylight = Container(name="DAYLIGHT")
-    c_daylight.append(ContentLine(
-        "DTSTART", value="16010325T020000"))
-    c_daylight.append(ContentLine(
-        "RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"))
+    c_daylight.append(ContentLine("DTSTART", value="16010325T020000"))
+    c_daylight.append(ContentLine("RRULE", value="FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"))
     c_daylight.append(ContentLine("TZOFFSETFROM", value="+0100"))
     c_daylight.append(ContentLine("TZOFFSETTO", value="+0200"))
 
     c_timezone = Container(name="VTIMEZONE")
-    c_timezone.append(ContentLine(
-        "TZID", value="W. Europe Standard Time"))
+    c_timezone.append(ContentLine("TZID", value="W. Europe Standard Time"))
     c_timezone.append(c_standard)
     c_timezone.append(c_daylight)
 
@@ -176,7 +177,6 @@ def generate_calenders():
     # generate calendars for every csv file
     for filename in os.listdir(INPUT_DIR):
         if filename.endswith(".csv"):
-
             # generate caldender output dir
             calender_name = filename.split(".")[0]
             calender_output_dir = OUTPUT_DIR + "/" + calender_name
@@ -207,7 +207,10 @@ def generate_calenders():
                         event.make_all_day()
 
                     # only dates, but no time
-                    elif o_event.start_datetime[1] is None or o_event.end_datetime[1] is None:
+                    elif (
+                        o_event.start_datetime[1] is None
+                        or o_event.end_datetime[1] is None
+                    ):
                         event.begin = o_event.start_datetime[0]
                         event.end = o_event.end_datetime[0]
                         event.make_all_day()
@@ -218,26 +221,36 @@ def generate_calenders():
                     ics_calender.events.add(event)
 
                     if o_event.repeat is not None:
-                        event.extra.append(ContentLine(name="RRULE",
-                                                       value="FREQ="+o_event.get_repeat() +
-                                                       ";UNTIL="+o_event.get_repeat_until_str()))
+                        event.extra.append(
+                            ContentLine(
+                                name="RRULE",
+                                value="FREQ="
+                                + o_event.get_repeat()
+                                + ";UNTIL="
+                                + o_event.get_repeat_until_str(),
+                            )
+                        )
 
-                ics_file_name = filename.split(".")[0] + "__"+cal.name + ".ics"
+                ics_file_name = filename.split(".")[0] + "__" + cal.name + ".ics"
                 output_path = calender_output_dir + "/" + ics_file_name
 
                 # add calender name property
-                ics_calender.extra.append(ContentLine(
-                    name="X-WR-CALNAME:", value=ics_file_name.split(".")[0]))
-                ics_calender.extra.append(ContentLine(
-                    name="NAME:", value=ics_file_name.split(".")[0]))
+                ics_calender.extra.append(
+                    ContentLine(name="X-WR-CALNAME:", value=ics_file_name.split(".")[0])
+                )
+                ics_calender.extra.append(
+                    ContentLine(name="NAME:", value=ics_file_name.split(".")[0])
+                )
 
                 ics_names.append(ics_file_name)
-                with codecs.open(output_path, 'w', encoding="utf-8", errors='ignore') as ics_file:
+                with codecs.open(
+                    output_path, "w", encoding="utf-8", errors="ignore"
+                ) as ics_file:
                     ics_file.writelines(
-                        map(replace_timezone, ics_calender.serialize_iter()))
+                        map(replace_timezone, ics_calender.serialize_iter())
+                    )
 
-            calender_names.append(
-                {"name": calender_name, "calenders": ics_names})
+            calender_names.append({"name": calender_name, "calenders": ics_names})
 
             print("---------------------------------------------------------------")
             for cal in calender:
